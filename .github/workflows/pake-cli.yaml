@@ -62,6 +62,9 @@ on:
         description: "Package formats (comma-separated: deb,appimage,rpm,zst)"
         required: false
         default: "deb"
+      inject:
+        description: "Inject CSS/JS files (comma-separated repo-relative paths)"
+        required: false
 
 jobs:
   build:
@@ -150,6 +153,14 @@ jobs:
             ARGS+=("--targets" "${{ inputs.targets }}")
           fi
 
+          if [ -n "${{ inputs.inject }}" ]; then
+            IFS=',' read -ra INJ <<< "${{ inputs.inject }}"
+            for f in "${INJ[@]}"; do
+              f="$(echo "$f" | xargs)"
+              [ -n "$f" ] && ARGS+=("--inject" "$f")
+            done
+          fi
+
           echo "Running: node dist/cli.js ${ARGS[@]}"
           node dist/cli.js "${ARGS[@]}"
 
@@ -190,6 +201,13 @@ jobs:
 
           if ("${{ inputs.hide_title_bar }}" -eq "true") {
             $args += "--hide-title-bar"
+          }
+
+          if ("${{ inputs.inject }}" -ne "") {
+            foreach ($f in "${{ inputs.inject }}".Split(",")) {
+              $t = $f.Trim()
+              if ($t -ne "") { $args += "--inject", $t }
+            }
           }
 
           Write-Host "Running: node dist/cli.js $($args -join ' ')"
