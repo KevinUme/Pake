@@ -1,0 +1,153 @@
+/* ===== Focor desktop — custom right-click menu (injected) ===== */
+/* Colors pull from the app's own design tokens (warm stone + teal),
+   with hardcoded dark fallbacks so it always renders correctly. */
+.focor-ctx-root, .focor-ctx-root * { box-sizing: border-box; }
+
+.focor-ctx-menu {
+  position: fixed;
+  z-index: 2147483000;
+  min-width: 248px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--popover, hsl(20 10% 10%));
+  border: 1px solid var(--border, hsl(20 6% 22%));
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  color: var(--popover-foreground, hsl(60 9% 98%));
+  user-select: none;
+  -webkit-user-select: none;
+  animation: focor-ctx-in 0.11s ease-out;
+  transform-origin: top left;
+}
+@keyframes focor-ctx-in {
+  from { opacity: 0; transform: scale(0.97) translateY(-3px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.focor-ctx-label {
+  padding: 8px 10px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-foreground, hsl(24 6% 63%));
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.focor-ctx-label .focor-ctx-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  border: 2px solid var(--primary, hsl(173 58% 38%));
+  position: relative;
+}
+.focor-ctx-label .focor-ctx-dot::after {
+  content: ""; position: absolute; inset: 2px;
+  border-radius: 50%; background: var(--primary, hsl(173 58% 38%));
+}
+
+.focor-ctx-sep { height: 1px; margin: 5px 6px; background: var(--border, hsl(20 6% 22%)); }
+
+.focor-ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: default;
+  font-size: 13px;
+  line-height: 1.2;
+  color: var(--popover-foreground, hsl(60 9% 98%));
+  transition: background 0.08s ease, color 0.08s ease;
+  position: relative;
+}
+.focor-ctx-item .focor-ctx-ico {
+  width: 17px; height: 17px; flex: 0 0 17px;
+  color: var(--muted-foreground, hsl(24 6% 63%));
+  transition: color 0.08s ease;
+  display: flex; align-items: center; justify-content: center;
+}
+.focor-ctx-item .focor-ctx-ico svg { width: 17px; height: 17px; display: block; }
+.focor-ctx-item .focor-ctx-text { flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.focor-ctx-item .focor-ctx-hint { font-size: 11px; color: var(--muted-foreground, hsl(24 6% 63%)); margin-left: auto; padding-left: 8px; }
+.focor-ctx-item .focor-ctx-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--primary, hsl(173 58% 38%)); background: rgba(38, 153, 138, 0.14);
+  border: 1px solid rgba(38, 153, 138, 0.32);
+  padding: 2px 6px; border-radius: 6px; margin-left: auto;
+}
+
+.focor-ctx-item:not(.is-disabled).is-active,
+.focor-ctx-item:not(.is-disabled):hover {
+  background: var(--accent, hsl(20 8% 18%));
+  color: var(--accent-foreground, hsl(60 9% 98%));
+}
+.focor-ctx-item:not(.is-disabled).is-active .focor-ctx-ico,
+.focor-ctx-item:not(.is-disabled):hover .focor-ctx-ico { color: var(--primary, hsl(173 58% 38%)); }
+
+.focor-ctx-item.is-disabled { opacity: 0.4; }
+
+/* ===== Hover info flyout ===== */
+.focor-ctx-info {
+  position: fixed;
+  z-index: 2147483001;
+  width: 268px;
+  padding: 15px;
+  border-radius: 12px;
+  background: var(--popover, hsl(20 10% 10%));
+  border: 1px solid var(--border, hsl(20 6% 22%));
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.focor-ctx-info.is-visible { opacity: 1; transform: translateX(0); }
+
+.focor-ctx-info .focor-ctx-info-ico {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: rgba(38, 153, 138, 0.14);
+  border: 1px solid rgba(38, 153, 138, 0.30);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary, hsl(173 58% 38%)); margin-bottom: 11px;
+}
+.focor-ctx-info .focor-ctx-info-ico svg { width: 20px; height: 20px; }
+.focor-ctx-info .focor-ctx-info-title {
+  font-size: 14px; font-weight: 650; color: var(--popover-foreground, hsl(60 9% 98%)); margin-bottom: 6px;
+}
+.focor-ctx-info .focor-ctx-info-desc {
+  font-size: 12.5px; line-height: 1.5; color: var(--muted-foreground, hsl(24 6% 63%)); margin: 0;
+}
+.focor-ctx-info .focor-ctx-info-eg {
+  margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--border, hsl(20 6% 22%));
+  font-size: 11.5px; color: var(--primary, hsl(173 58% 38%)); display: flex; align-items: center; gap: 7px;
+}
+.focor-ctx-info .focor-ctx-info-sel {
+  margin-top: 11px; padding: 8px 10px; border-radius: 8px;
+  background: var(--muted, hsl(20 6% 15%)); border: 1px solid var(--border, hsl(20 6% 22%));
+  font-size: 11.5px; color: var(--popover-foreground, hsl(60 9% 98%)); line-height: 1.45;
+  max-height: 54px; overflow: hidden;
+}
+.focor-ctx-info .focor-ctx-info-sel b { color: var(--muted-foreground, hsl(24 6% 63%)); font-weight: 600; }
+
+/* ===== Tiny toast for preview clicks ===== */
+.focor-ctx-toast {
+  position: fixed; z-index: 2147483002;
+  left: 50%; bottom: 34px; transform: translateX(-50%) translateY(8px);
+  padding: 10px 16px; border-radius: 10px;
+  background: var(--popover, hsl(20 10% 10%));
+  border: 1px solid rgba(38, 153, 138, 0.38);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  font-family: -apple-system, system-ui, sans-serif; font-size: 12.5px;
+  color: var(--popover-foreground, hsl(60 9% 98%));
+  display: flex; align-items: center; gap: 9px;
+  opacity: 0; transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.focor-ctx-toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+.focor-ctx-toast .focor-ctx-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  border: 2px solid var(--primary, hsl(173 58% 38%)); position: relative; flex: 0 0 9px;
+}
+.focor-ctx-toast .focor-ctx-dot::after {
+  content: ""; position: absolute; inset: 2px; border-radius: 50%; background: var(--primary, hsl(173 58% 38%));
+}
